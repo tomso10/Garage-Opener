@@ -24,7 +24,7 @@ RELAY_PIN_1 = 17  # adjust to whichever GPIO pin relay 1 is wired to
 RELAY_PIN_2 = 27  # adjust to whichever GPIO pin relay 2 is wired to
 PULSE_SECONDS = 0.5  # how long to hold the relay closed
 
-LED_PATH = "/sys/class/leds/led0/brightness"  # onboard ACT LED; set trigger to "none" first (see setup notes)
+LED_PATH = "/sys/class/leds/ACT/brightness"  # onboard ACT LED; set trigger to "none" first (see setup notes)
 LED_FLASH_COUNT = 3
 LED_ON_SECONDS = 0.15
 LED_OFF_SECONDS = 0.15
