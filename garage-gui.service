@@ -1,0 +1,17 @@
+[Unit]
+Description=Garage Door GUI (port 80)
+After=network.target
+
+[Service]
+User=gumpy
+WorkingDirectory=/home/gumpy/Garage-Opener
+ExecStart=/home/gumpy/.local/bin/gunicorn --bind 0.0.0.0:80 --workers 1 gui:app
+Restart=on-failure
+RestartSec=5
+# Port 80 is privileged; this grants just enough capability to bind it
+# without running the whole process as root.
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target
