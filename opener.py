@@ -222,7 +222,10 @@ def openapi_spec():
 swagger_ui_blueprint = get_swaggerui_blueprint(
     SWAGGER_URL,
     API_SPEC_URL,
-    config={"app_name": "Garage Door Opener API"},
+    config={
+        "app_name": "Garage Door Opener API",
+        "validatorUrl": None,  # disable the external online validator; it can't reach a private LAN address
+    },
 )
 app.register_blueprint(swagger_ui_blueprint, url_prefix=SWAGGER_URL)
 
