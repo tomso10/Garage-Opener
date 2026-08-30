@@ -24,6 +24,11 @@ RELAY_PIN_1 = 17  # adjust to whichever GPIO pin relay 1 is wired to
 RELAY_PIN_2 = 27  # adjust to whichever GPIO pin relay 2 is wired to
 PULSE_SECONDS = 0.5  # how long to hold the relay closed
 
+LED_PATH = "/sys/class/leds/led0/brightness"  # onboard ACT LED; set trigger to "none" first (see setup notes)
+LED_FLASH_COUNT = 3
+LED_ON_SECONDS = 0.15
+LED_OFF_SECONDS = 0.15
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 LOG_FILE = os.path.join(BASE_DIR, "opener.log")          # human-readable log
 JSON_LOG_FILE = os.path.join(BASE_DIR, "opener_log.jsonl")  # structured log, one JSON object per line
@@ -48,6 +53,23 @@ RELAYS = {
     "1": relay_1,
     "2": relay_2,
 }
+
+
+def flash_led(times=LED_FLASH_COUNT, on_time=LED_ON_SECONDS, off_time=LED_OFF_SECONDS):
+    """Blink the Pi's onboard ACT LED to visually confirm a trigger signal
+    was received. Fails silently if the LED path isn't writable (e.g. the
+    udev rule/trigger mode hasn't been set up yet) so it never blocks the
+    actual relay trigger."""
+    try:
+        for _ in range(times):
+            with open(LED_PATH, "w") as f:
+                f.write("1")
+            time.sleep(on_time)
+            with open(LED_PATH, "w") as f:
+                f.write("0")
+            time.sleep(off_time)
+    except (FileNotFoundError, PermissionError, OSError):
+        pass
 
 
 def record_event(action, door, ip, success=True, detail=None):
@@ -88,6 +110,8 @@ def trigger(door):
     if relay is None:
         record_event("trigger", door, request.remote_addr, success=False, detail="unknown door")
         abort(404, description=f"Unknown door '{door}'. Use '1' or '2'.")
+
+    flash_led()  # visual confirmation that a valid open/close signal was received
 
     relay.on()
     time.sleep(PULSE_SECONDS)
