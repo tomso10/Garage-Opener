@@ -2,6 +2,7 @@ import hmac
 import json
 import logging
 import os
+import threading
 import time
 from datetime import datetime, timezone
 
@@ -111,7 +112,7 @@ def trigger(door):
         record_event("trigger", door, request.remote_addr, success=False, detail="unknown door")
         abort(404, description=f"Unknown door '{door}'. Use '1' or '2'.")
 
-    flash_led()  # visual confirmation that a valid open/close signal was received
+    threading.Thread(target=flash_led, daemon=True).start()  # non-blocking: don't delay the relay
 
     relay.on()
     time.sleep(PULSE_SECONDS)
