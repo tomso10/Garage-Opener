@@ -1,0 +1,15 @@
+[Unit]
+Description=Garage Door API (port 5000)
+After=network.target
+
+[Service]
+User=gumpy
+WorkingDirectory=/home/gumpy/Garage-Opener
+EnvironmentFile=/home/gumpy/Garage-Opener/.env
+ExecStart=/home/gumpy/.local/bin/gunicorn --bind 0.0.0.0:5000 --workers 1 opener:app
+Restart=on-failure
+RestartSec=5
+SupplementaryGroups=gpio
+
+[Install]
+WantedBy=multi-user.target
